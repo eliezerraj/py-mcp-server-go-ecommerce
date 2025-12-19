@@ -1,0 +1,9 @@
+fastapi
+mcp
+mcp[cli]
+aiohttp
+opentelemetry-sdk
+opentelemetry-api
+opentelemetry-instrumentation-aiohttp-client
+opentelemetry-instrumentation-logging
+opentelemetry-exporter-otlp
