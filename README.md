@@ -1,48 +1,74 @@
-# py-mcp-server-go-ecommerce
+## py-mcp-server-go-ecommerce
 
-    Custom MCP server for POC purposes
+Custom MCP server for POC purposes.
 
-# create venv
+The MCP expose/access the public endpoints for go-inventory and go-order using python FASTAPI.
+
+## Integration
+
+   This is workload requires go-inventory and go-order
+
+   The integrations are made via http-streamable api request.
+
+## Enviroment variables
+
+To run in local machine for local tests creat a .env in /cmd folder
+
+    VERSION=1.0.0
+    ACCOUNT=aws:999999999
+    APP_NAME=py-mcp-server-ecommerce.localhost
+    HOST=127.0.0.1 
+    PORT=9002
+    SESSION_TIMEOUT=700
+    OTEL_EXPORTER_OTLP_ENDPOINT=localhost:4317
+    INVENTORY_URL=http://localhost:7000
+    ORDER_URL=http://localhost:7004
+
+## create venv
 
     python3 -m venv .venv
 
-# activate
+## activate
 
     source .venv/bin/activate
 
-# install dependecies
+## install dependecies
 
     pip install -r requirements.txt
 
-# run
+## run
 
     python ./app/server.py
 
-# test Local
+## test Local
 
-    export POD_NAME=py-mcp-server-go-ecommerce.localhost
+    export VERSION=0.1
+    export ACCOUNT=aws:999999999
+    export APP_NAME=py-mcp-server-go-ecommerce.localhost
     export HOST=127.0.0.1 
     export PORT=9002
     export SESSION_TIMEOUT=700
     export OTEL_EXPORTER_OTLP_ENDPOINT=localhost:4317
+    export INVENTORY_URL=http://localhost:7000
+    export ORDER_URL=http://localhost:7004
 
-# forward otel traces/metrics
+## forward otel traces/metrics
 
     kubectl port-forward svc/arch-eks-01-02-otel-collector 4317:4317
 
-# run mcp inspector
+## run mcp inspector
 
-    Session 1
-    $npx @modelcontextprotocol/inspector 
+    Session 1 (venv activated)
+    npx @modelcontextprotocol/inspector 
 
-    Sesssion 2
+    Sesssion 2 (venv activated)
     ./app/python server.py
 
     Setup
     Transport Type: streamable http
     URL: http://localhost:9002/mcp
 
-# 1 Session Open
+## 1 Session Open
 
     curl -X POST http://localhost:9002/mcp \
         -H "Content-Type: application/json" \
@@ -63,7 +89,7 @@
 
 export SESSION_ID=f3c6287932c54c988a2438f43eead9ca
 
-# 1 Initialize
+## 1 Initialize
 
     curl -X POST http://localhost:9002/mcp \
         -H "Content-Type: application/json" \
@@ -80,7 +106,7 @@ export SESSION_ID=f3c6287932c54c988a2438f43eead9ca
                 }
             }'
 
-# 3. Send Initialized Notification
+## 3. Send Initialized Notification
 
     curl -X POST http://localhost:9002/mcp \
         -H "Content-Type: application/json" \
@@ -91,7 +117,7 @@ export SESSION_ID=f3c6287932c54c988a2438f43eead9ca
                 "method":"notifications/initialized"
         }'
 
-# 4. List Tools
+## 4. List Tools
 
     curl -X POST http://localhost:9002/mcp \
         -H "Content-Type: application/json" \
@@ -103,7 +129,7 @@ export SESSION_ID=f3c6287932c54c988a2438f43eead9ca
             "method":"tools/list"
         }'
 
-# 5. Call Tool
+## 5. Call Tool
 
     curl -X POST http://localhost:9002/mcp \
         -H "Content-Type: application/json" \
@@ -116,7 +142,7 @@ export SESSION_ID=f3c6287932c54c988a2438f43eead9ca
             "params":{}
         }'
 
-# 4. Call Add Tool
+## 4. Call Tool
     curl -X POST http://localhost:9002/mcp \
         -H "Content-Type: application/json" \
         -H "MCP-Protocol-Version: 2025-06-18" \

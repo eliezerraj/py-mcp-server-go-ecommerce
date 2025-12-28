@@ -4,8 +4,9 @@ import aiohttp
 from dotenv import load_dotenv
 from datetime import datetime
 
-from typing import Dict, List, Any
+from entities import Info
 
+from typing import Dict, List, Any
 from mcp.server.fastmcp import FastMCP
 
 from opentelemetry import trace, metrics, propagate
@@ -20,26 +21,26 @@ from opentelemetry.propagate import inject
 from opentelemetry.propagate import extract
 from opentelemetry.context import attach, detach
 
-# Load .env file
-load_dotenv()
+# Load .env file (uncomment if needed or use the export method to set env variables)
+# load_dotenv()
 
 #---------------------------------
 # Initialize tracing
 #---------------------------------
-
-POD_NAME = os.getenv("POD_NAME")
+VERSION = os.getenv("VERSION")
+ACCOUNT = os.getenv("ACCOUNT")
+APP_NAME = os.getenv("APP_NAME")
 HOST = os.getenv("HOST")
 PORT = os.getenv("PORT")
 SESSION_TIMEOUT = int(os.getenv("SESSION_TIMEOUT")) 
 OTEL_EXPORTER_OTLP_ENDPOINT = os.getenv("OTEL_EXPORTER_OTLP_ENDPOINT")
-#INVENTORY_URL = "https://go-api-global.architecture.caradhras.io/inventory"
-INVENTORY_URL = "http://localhost:7000"
-
-#ORDER_URL = "https://go-api-global.architecture.caradhras.io/order"
-ORDER_URL = "http://localhost:7004"
+INVENTORY_URL = os.getenv("INVENTORY_URL") 
+ORDER_URL = os.getenv("ORDER_URL") 
 
 print("---" * 15)
-print(f"POD_NAME: {POD_NAME}")
+print(f"VERSION: {VERSION}")
+print(f"ACCOUNT: {ACCOUNT}")
+print(f"APP_NAME: {APP_NAME}")
 print(f"HOST: {HOST}")
 print(f"PORT: {PORT}")
 print(f"SESSION_TIMEOUT: {SESSION_TIMEOUT}")
@@ -47,7 +48,7 @@ print(f"OTEL_EXPORTER_OTLP_ENDPOINT: {OTEL_EXPORTER_OTLP_ENDPOINT}")
 
 # Create a TracerProvider
 resource = Resource.create({
-                "service.name": POD_NAME
+                "service.name": APP_NAME
 })
 
 trace_provider = TracerProvider(resource=resource)
@@ -70,7 +71,7 @@ AioHttpClientInstrumentor().instrument()
 LoggingInstrumentor().instrument(set_logging_format=True)
 
 # create trace
-tracer = trace.get_tracer(POD_NAME)
+tracer = trace.get_tracer(APP_NAME)
 
 #---------------------------------
 # setup MCP server
@@ -105,6 +106,39 @@ formatter = TruncatingFormatter('%(asctime)s - %(levelname)s - %(message)s', max
 
 handler.setFormatter(formatter)
 logger.addHandler(handler)
+
+# -----------------------------------------------------
+# Info
+# -----------------------------------------------------
+@mcp.tool(name="mcp_info")
+async def mcp_info() -> str:
+    """
+    Information MCP server.
+    """
+    print('\033[31m =.=.= \033[0m' * 15)
+    logger.info("function => mcp_info() called.")
+
+    info_data = {
+        "version": VERSION,
+        "account": ACCOUNT,
+        "app_name": APP_NAME,
+        "host": HOST,
+        "port": int(PORT),
+        "session_timeout": int(SESSION_TIMEOUT),
+        "product_url": INVENTORY_URL,
+        "order_url": ORDER_URL,
+    }
+
+    # Initialize with a default value
+    info = ""
+
+    try:
+        info_obj = Info(**info_data)
+        info = info_obj.model_dump_json()
+    except Exception as e:
+        logger.error(f"Exception : {e}")
+
+    return info
 
 # -----------------------------------------------------
 # Ping
