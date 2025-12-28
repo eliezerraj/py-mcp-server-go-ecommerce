@@ -5,7 +5,7 @@
   },
   {
     "ParameterKey": "RepositoryName",
-    "ParameterValue": "py-mcp-server-ecommerce"
+    "ParameterValue": "py-mcp-server-go-ecommerce"
   },
   {
     "ParameterKey": "Namespace",
@@ -17,7 +17,7 @@
   },
   {
     "ParameterKey": "ServiceAccountName",
-    "ParameterValue": "sa-py-mcp-server-ecommerce"
+    "ParameterValue": "sa-py-mcp-server-go-ecommerce"
   },
   {
     "ParameterKey": "RoleName",
