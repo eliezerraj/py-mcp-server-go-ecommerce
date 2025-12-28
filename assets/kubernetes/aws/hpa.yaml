@@ -1,7 +1,7 @@
 apiVersion: autoscaling/v2
 kind: HorizontalPodAutoscaler
 metadata:
-  name: &app-name py-mcp-server-ecommerce-hpa
+  name: &app-name py-mcp-server-go-ecommerce-hpa
   namespace: test-a
   labels:
     app: *app-name
@@ -9,7 +9,7 @@ spec:
   scaleTargetRef:
     apiVersion: apps/v1
     kind: Deployment
-    name: py-mcp-server-ecommerce
+    name: py-mcp-server-go-ecommerce
   minReplicas: 1
   maxReplicas: 3
   metrics:
