@@ -1,0 +1,25 @@
+apiVersion: gateway.k8s.aws/v1beta1
+kind: TargetGroupConfiguration
+metadata:
+  name: tg-py-mcp-server-ecommerce
+  namespace: test-a
+  labels:
+    app: tg-py-mcp-server-ecommerce
+spec:
+  targetReference:
+    name: svc-py-mcp-server-ecommerce
+  defaultConfiguration:
+    targetGroupName: tg-py-mcp-server-ecommerce
+    targetType: ip
+  routeConfigurations:
+    - routeIdentifier:
+        kind: HTTPRoute
+        name: py-mcp-server-ecommerce-route
+        namespace: test-a
+      targetGroupProps:
+        healthCheckConfig:
+          healthCheckProtocol: HTTP
+          healthCheckPath: /health
+          healthCheckPort: traffic-port 
+          healthyThresholdCount: 2 
+          unhealthyThresholdCount: 2
