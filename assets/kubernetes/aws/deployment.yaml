@@ -1,7 +1,7 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: &app-name py-mcp-server-ecommerce
+  name: &app-name py-mcp-server-go-ecommerce
   namespace: test-a
   labels:
     app: *app-name
@@ -17,7 +17,7 @@ spec:
       labels:
         app: *app-name
     spec:
-      serviceAccountName: sa-py-mcp-server-ecommerce
+      serviceAccountName: sa-py-mcp-server-go-ecommerce
       volumes:
       securityContext:
         runAsUser: 1000
@@ -25,7 +25,7 @@ spec:
         fsGroup: 3000
       containers:
       - name: *app-name
-        image: 908671954593.dkr.ecr.us-east-2.amazonaws.com/py-mcp-server-ecommerce:latest
+        image: 908671954593.dkr.ecr.us-east-2.amazonaws.com/py-mcp-server-go-ecommerce:latest
         envFrom:
         - configMapRef:
             name: py-mcp-server-ecommerce-cm
@@ -63,7 +63,7 @@ spec:
               command:
               - /bin/sh
               - -c
-              - "ps -A | grep py-mcp-server-ecommerce | grep -v grep"
+              - "ps -A | grep py-mcp-server-go-ecommerce| grep -v grep"
             initialDelaySeconds: 5
             periodSeconds: 30
             failureThreshold: 3

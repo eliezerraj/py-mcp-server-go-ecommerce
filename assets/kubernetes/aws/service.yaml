@@ -1,7 +1,7 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: &app-name svc-py-mcp-server-ecommerce
+  name: &app-name svc-py-mcp-server-go-ecommerce
   namespace: test-a
   labels:
     app: *app-name
@@ -13,4 +13,4 @@ spec:
     protocol: TCP
     name: http
   selector:
-    app: go-py-mcp-server-ecommerce
+    app: py-mcp-server-go-ecommerce

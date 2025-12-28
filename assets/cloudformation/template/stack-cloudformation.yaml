@@ -4,7 +4,7 @@ Description: Template GitAction v2.0 - 23/11/2025
 Parameters:
   RepositoryName: 
     Type: String
-    Default: py-mcp-server-ecommerce
+    Default: py-mcp-server-go-ecommerce
   RoleName:
     Type: String
     Default: PyMcpEcommerceRole
@@ -23,7 +23,7 @@ Parameters:
     Default: architecture
   ApplicationName:
     Type: String
-    Default: go-clearance
+    Default: py-mcp-server-go-ecommerce
   ComponentName:
     Type: String
     Default: ecr
@@ -49,7 +49,7 @@ Parameters:
   ServiceAccountName:
     Type: String
     Description: The name of the Kubernetes service account.
-    Default: sa-go-clearance
+    Default: sa-py-mcp-server-go-ecommerce
 
 Resources:
   EcrRepo:
