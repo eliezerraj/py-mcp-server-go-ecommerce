@@ -8,6 +8,7 @@ from entities import Info
 
 from typing import Dict, List, Any
 from mcp.server.fastmcp import FastMCP
+from starlette.responses import JSONResponse
 
 from opentelemetry import trace, metrics, propagate
 from opentelemetry.sdk.resources import Resource
@@ -106,6 +107,17 @@ formatter = TruncatingFormatter('%(asctime)s - %(levelname)s - %(message)s', max
 
 handler.setFormatter(formatter)
 logger.addHandler(handler)
+
+# -----------------------------------------------------
+# Health Check
+# -----------------------------------------------------
+@mcp.custom_route("/health", methods=["GET"])
+async def health_check(request):
+    """
+    A simple health check that returns a healthy status.
+    For a liveness probe, it should only confirm the process is running.
+    """
+    return JSONResponse({"message": "true"})
 
 # -----------------------------------------------------
 # Info
