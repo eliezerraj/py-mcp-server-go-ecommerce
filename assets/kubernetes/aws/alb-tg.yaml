@@ -4,10 +4,10 @@ metadata:
   name: tg-py-mcp-server-go-ecommerce
   namespace: test-a
   labels:
-    app: tg-py-mcp-server-go-ecommercece
+    app: tg-py-mcp-server-go-ecommerce
 spec:
   targetReference:
-    name: svc-py-mcp-server-ecommerce
+    name: svc-py-mcp-server-go-ecommerce
   defaultConfiguration:
     targetGroupName: tg-py-mcp-server-go-ecommerce
     targetType: ip

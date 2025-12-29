@@ -62,7 +62,7 @@ To run in local machine for local tests creat a .env in /cmd folder
     npx @modelcontextprotocol/inspector 
 
     Sesssion 2 (venv activated)
-    ./app/python server.py
+    python ./app/server.py
 
     Setup
     Transport Type: streamable http
