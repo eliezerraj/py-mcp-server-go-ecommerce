@@ -28,7 +28,7 @@ spec:
         image: 992382474575.dkr.ecr.us-east-2.amazonaws.com/py-mcp-server-go-ecommerce:latest
         envFrom:
         - configMapRef:
-            name: py-mcp-server-ecommerce-cm
+            name: py-mcp-server-go-ecommerce-cm
         resources:
            requests:
              cpu: 100m
@@ -49,26 +49,24 @@ spec:
         - name: http
           containerPort: 9002
           protocol: TCP
-        #readinessProbe:
-        #    httpGet:
-        #      path: /health
-        #      port: http
-        #    initialDelaySeconds: 3
-        #    periodSeconds: 30
-        #    failureThreshold: 3
-        #    successThreshold: 1
-        #    timeoutSeconds: 30
-        #livenessProbe:
-        #    exec:
-        #      command:
-        #      - /bin/sh
-        #      - -c
-        #      - "ps -A | grep py-mcp-server-go-ecommerce| grep -v grep"
-        #    initialDelaySeconds: 5
-        #    periodSeconds: 30
-        #    failureThreshold: 3
-        #    successThreshold: 1
-        #    timeoutSeconds: 5
+        readinessProbe:
+            httpGet:
+              path: /health
+              port: http
+            initialDelaySeconds: 3
+            periodSeconds: 30
+            failureThreshold: 3
+            successThreshold: 1
+            timeoutSeconds: 30
+        livenessProbe:
+            httpGet:
+              path: /health
+              port: http
+            initialDelaySeconds: 3
+            periodSeconds: 30
+            failureThreshold: 3
+            successThreshold: 1
+            timeoutSeconds: 10
         lifecycle:
           preStop:
             exec:

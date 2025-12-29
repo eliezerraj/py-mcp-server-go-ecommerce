@@ -87,7 +87,7 @@ To run in local machine for local tests creat a .env in /cmd folder
         }' \
         -v 2>&1 | grep -i "mcp-session-id" | cut -d' ' -f3
 
-export SESSION_ID=f3c6287932c54c988a2438f43eead9ca
+export SESSION_ID=91b6eea6b2a948cca53ce3dfce277870
 
 ## 1 Initialize
 
