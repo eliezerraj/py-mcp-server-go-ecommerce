@@ -45,13 +45,13 @@ def setup_logger(LOG_LEVEL: str,
     root_logger .addHandler(handler)
 
     # File logging if OTEL_LOGS is enabled
-    if OTEL_STDOUT_LOG_GROUP:
+    if OTEL_STDOUT_LOG_GROUP == True:
         # Ensure the directory exists
         os.makedirs(os.path.dirname(LOG_GROUP), exist_ok=True) 
         BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
         LOG_GROUP = os.path.join(BASE_DIR,LOG_GROUP)
 
-        MAX_BYTES = 10 * 1024# 1 MB
+        MAX_BYTES = 10 * 1024 # 1 MB
         BACKUP_COUNT = 1    
         file_handler = RotatingFileHandler(
             LOG_GROUP,
@@ -60,3 +60,4 @@ def setup_logger(LOG_LEVEL: str,
         )
         file_handler.setFormatter(formatter)
         root_logger.addHandler(file_handler)
+        root_logger.info(f"File logging enabled. Logs are being written to: {LOG_GROUP}")
