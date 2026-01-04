@@ -23,6 +23,10 @@ To run in local machine for local tests creat a .env in /cmd folder
     OTEL_EXPORTER_OTLP_ENDPOINT=localhost:4317
     INVENTORY_URL=http://localhost:7000
     ORDER_URL=http://localhost:7004
+    LOG_LEVEL=INFO 
+    OTEL_LOGS=True
+    OTEL_STDOUT_LOG_GROUP=True
+    LOG_GROUP=/mnt/c/Eliezer/log/py-mcp-server-go-ecommerce.log
 
 ## create venv
 
@@ -36,9 +40,9 @@ To run in local machine for local tests creat a .env in /cmd folder
 
     pip install -r requirements.txt
 
-## run
+## run (root)
 
-    python ./app/server.py
+    python -m app.main
 
 ## test Local
 
@@ -51,6 +55,10 @@ To run in local machine for local tests creat a .env in /cmd folder
     export OTEL_EXPORTER_OTLP_ENDPOINT=localhost:4317
     export INVENTORY_URL=http://localhost:7000
     export ORDER_URL=http://localhost:7004
+    export LOG_LEVEL=INFO 
+    export OTEL_LOGS=true
+    export OTEL_STDOUT_LOG_GROUP=true
+    export LOG_GROUP=/mnt/c/Eliezer/log/py-mcp-server-go-ecommerce.log
 
 ## forward otel traces/metrics
 
