@@ -9,3 +9,4 @@ class Info(BaseModel):
     session_timeout: int
     product_url: AnyHttpUrl
     order_url: AnyHttpUrl
+    log_level: str

@@ -16,4 +16,9 @@ data:
   INVENTORY_URL: "https://go-inventory.architecture.caradhras.io"
   ORDER_URL: "https://go-order.architecture.caradhras.io"
   
-  LOG_LEVEL: "warning" #info, error, warning
+  LOG_LEVEL: "INFO" #info, error, warning
+
+  # the features below works only for a local machine, for kubernetes all logs are shipping via a collector
+  OTEL_LOGS: "false"
+  OTEL_STDOUT_LOG_GROUP: "false"
+  LOG_GROUP: "/mnt/c/Eliezer/log/py-mcp-server-go-ecommerce.log"
