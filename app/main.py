@@ -49,8 +49,8 @@ logger.info(f"info: {info}")
 # Load tools
 # ------------------------------------------------------------------- #
 from app.tools.info import mcp_info, ping 
-from app.tools.inventory import inventory_healthy, create_inventory, get_product, get_inventory, update_inventory
-from app.tools.order import order_healthy, get_order, checkout_order, create_order
+from app.tools.inventory import inventory_health, create_inventory, get_product, get_inventory, update_inventory
+from app.tools.order import order_health, get_order, checkout_order, create_order
 # ------------------------------------------------------------------- #
 # Main
 # ------------------------------------------------------------------- #

@@ -4,8 +4,10 @@ import aiohttp
 from typing import Dict, Any
 
 from typing import Optional
-from app.server.mcp_server import SESSION_TIMEOUT, ORDER_URL, mcp
 from app.log.logger import REQUEST_ID_CTX
+from app.server.mcp_server import SESSION_TIMEOUT, ORDER_URL, mcp
+
+from app.middleware.context_middleware import context_middleware, JWT_TOKEN
 
 from opentelemetry import trace, propagate
 from opentelemetry.propagate import extract
@@ -17,17 +19,18 @@ logger = logging.getLogger(__name__)
 session_timeout = aiohttp.ClientTimeout(total=SESSION_TIMEOUT)
 
 # -----------------------------------------------------
-# Order Heatlhy
+# Order Health
 # -----------------------------------------------------
-@mcp.tool(name="order_healthy")
-async def order_healthy(context: Optional[dict] = None) -> str:
+@mcp.tool(name="order_health")
+@context_middleware(require_context=True)
+async def order_health(context: Optional[dict] = None) -> dict:
     """
-    Check the healthy status of Order service.
+    Check the health and enviroment variables of Order service.
     
     Args:
         - context: JWT and some metadata
     Response:
-        - content: all information about Order service healthy status and enviroment variables.
+        - content: all information about Order service health and enviroment variables.
     Raises:
         - valueError: http status code.
     """
@@ -38,29 +41,15 @@ async def order_healthy(context: Optional[dict] = None) -> str:
     logger.info(f"func:{func_name}: context: {context}")
 
     url = ORDER_URL + "/info"
-
-    # extract the trace infos
-    carrier= context.get("_trace", {}) if context else {}
-    ctx = extract(carrier)
-    token = attach(ctx)
-
+    
     with tracer.start_as_current_span(func_name) as span:
         span.set_attribute("mcp.tool", func_name)
         span.set_attribute("request.url", url) 
 
-        jwt_token = context.get("jwt") if context else None
-        if not jwt_token:
-            span.set_status(trace.Status(trace.StatusCode.ERROR))
-            message_error = "No JWT provided, NOT AUTHORIZED, statuscode: 403"
-            logger.error("message_error")
-            return message_error
-    
-        if context:
-            token_pre_state = REQUEST_ID_CTX.set(context.get("x-request-id", "MCP_NOT_INFORMED"))
-
-        headers = {"Authorization": f"Bearer {jwt_token}",
-                   "X-Request-Id": REQUEST_ID_CTX.get(),
-        } 
+        # the REQUEST_ID_CTX and JWT_TOKEN is already set in the middleware
+        headers = {"Authorization": f"Bearer {JWT_TOKEN}",
+                   "X-Request-Id": REQUEST_ID_CTX.get()
+        }   
 
         try: 
             async with aiohttp.ClientSession(timeout=session_timeout) as session:
@@ -71,28 +60,35 @@ async def order_healthy(context: Optional[dict] = None) -> str:
                     if resp.status == 200:
                         data = await resp.json()
                         logger.info(f"data: {data}")
-                        return f"{data}"
+                        return {"status": "success", 
+                                "status_code": resp.status,
+                                "message": "order_health", 
+                                "data": data}
                     else:
                         span.record_exception(e)
-                        message_error = f"Failed to fetch order healthy, statuscode: {resp.status}"
+                        message_error = f"Failed to fetch order health, statuscode: {resp.status}"
                         logger.error(message_error)
-                        return message_error
+                        return {"status": "error", 
+                                "status_code": resp.status, 
+                                "message": message_error,
+                                "data": None} 
         except Exception as e:
             span.record_exception(e)
             logger.error(f"Exception : {e}")
-            return f"Exception : {e}"
-        finally:
-            REQUEST_ID_CTX.reset(token_pre_state)
-            detach(token)
+            return {"status": "error", 
+                        "status_code": 500, 
+                        "message": str(e),
+                        "data": None}
 
 # -----------------------------------------------------
 # Get Order
 # -----------------------------------------------------
 @mcp.tool(name="get_order")
+@context_middleware(require_context=True)
 async def get_order(order: str, 
-                    context: Optional[dict] = None) -> str:
+                    context: Optional[dict] = None) -> dict:
     """
-    Get all order details details product details such as sku, type, name, status and quantity available, reserved and sold.
+    Get all order details details product details such as sku, type, name and quantity available, reserved and sold.
 
     Args:
         - order: order id
@@ -109,29 +105,15 @@ async def get_order(order: str,
     logger.info(f"func:{func_name} : order:{order} : context: {context}")
 
     url = ORDER_URL + f"/order/{order}"
-    
-    # extract the trace infos
-    carrier= context.get("_trace", {}) if context else {}
-    ctx = extract(carrier)
-    token = attach(ctx)
-
+        
     with tracer.start_as_current_span(func_name) as span:
         span.set_attribute("mcp.tool", func_name)
         span.set_attribute("request.url", url) 
 
-        jwt_token = context.get("jwt") if context else None
-        if not jwt_token:
-            span.set_status(trace.Status(trace.StatusCode.ERROR))
-            message_error = "No JWT provided, NOT AUTHORIZED, statuscode: 403"
-            logger.error("message_error")
-            return message_error
-    
-        if context:
-            token_pre_state = REQUEST_ID_CTX.set(context.get("x-request-id", "MCP_NOT_INFORMED"))
-
-        headers = {"Authorization": f"Bearer {jwt_token}",
-                   "X-Request-Id": REQUEST_ID_CTX.get(),
-        } 
+        # the REQUEST_ID_CTX and JWT_TOKEN is already set in the middleware
+        headers = {"Authorization": f"Bearer {JWT_TOKEN}",
+                   "X-Request-Id": REQUEST_ID_CTX.get()
+        }    
 
         try:     
             async with aiohttp.ClientSession(timeout=session_timeout) as session:
@@ -142,26 +124,33 @@ async def get_order(order: str,
                     if resp.status == 200:
                         data = await resp.json()
                         logger.info(f"data: {data}")
-                        return f"{data}"
+                        return {"status": "success", 
+                                "status_code": resp.status,
+                                "message": "get_order", 
+                                "data": data}
                     else:
                         message_error = f"Failed to fetch order from {order}, statuscode: {resp.status}"
                         logger.error(message_error)
-                        return message_error
+                        return {"status": "error", 
+                                "status_code": resp.status, 
+                                "message": message_error,
+                                "data": None}  
         except Exception as e:
             span.record_exception(e)
             logger.error(f"Exception : {e}")
-            return f"Exception : {e}"
-        finally:
-            REQUEST_ID_CTX.reset(token_pre_state)
-            detach(token)
+            return {"status": "error", 
+                    "status_code": 500, 
+                    "message": str(e),
+                    "data": None}
 
 # -----------------------------------------------------
 # Checkout Order
 # -----------------------------------------------------
 @mcp.tool(name="checkout_order")
+@context_middleware(require_context=True)
 async def checkout_order(order: int,
                          payment: Dict[str, Any],
-                         context: Optional[dict] = None) -> str:
+                         context: Optional[dict] = None) -> dict:
     """
     Do a checkout (payment) of a given order. A list of payments should be provided with data such as type (CASH, CREDIT or DEBIT), currency and amount.
 
@@ -182,28 +171,14 @@ async def checkout_order(order: int,
 
     url = ORDER_URL + "/checkout"
     
-    # extract the trace infos
-    carrier= context.get("_trace", {}) if context else {}
-    ctx = extract(carrier)
-    token = attach(ctx)
-
     with tracer.start_as_current_span(func_name) as span:
         span.set_attribute("mcp.tool", func_name)
         span.set_attribute("request.url", url) 
 
-        jwt_token = context.get("jwt") if context else None
-        if not jwt_token:
-            span.set_status(trace.Status(trace.StatusCode.ERROR))
-            message_error = "No JWT provided, NOT AUTHORIZED, statuscode: 403"
-            logger.error("message_error")
-            return message_error
-    
-        if context:
-            token_pre_state = REQUEST_ID_CTX.set(context.get("x-request-id", "MCP_NOT_INFORMED"))
-
-        headers = {"Authorization": f"Bearer {jwt_token}",
-                   "X-Request-Id": REQUEST_ID_CTX.get(),
-        } 
+        # the REQUEST_ID_CTX and JWT_TOKEN is already set in the middleware
+        headers = {"Authorization": f"Bearer {JWT_TOKEN}",
+                   "X-Request-Id": REQUEST_ID_CTX.get()
+        }   
 
         payload = {
                     "id": order,
@@ -221,28 +196,35 @@ async def checkout_order(order: int,
                     if resp.status == 200:
                         data = await resp.json()
                         logger.info(f"data: {data}")
-                        return f"{data}"
+                        return {"status": "success", 
+                                "status_code": resp.status,
+                                "message": "checkout_order", 
+                                "data": data}
                     else:
                         message_error = f"Failed to fetch order from {order}, statuscode: {resp.status}"
                         logger.error(message_error)
-                        return message_error
+                        return {"status": "error", 
+                                "status_code": resp.status, 
+                                "message": message_error,
+                                "data": None}  
         except Exception as e:
             span.record_exception(e)
             logger.error(f"Exception : {e}")
-            return f"Exception : {e}"
-        finally:
-            REQUEST_ID_CTX.reset(token_pre_state)
-            detach(token)
+            return {"status": "error", 
+                        "status_code": 500, 
+                        "message": str(e),
+                        "data": None}
 
 # -----------------------------------------------------
 # Create Order
 # -----------------------------------------------------
 @mcp.tool(name="create_order")
+@context_middleware(require_context=True)
 async def create_order( user: str,
                         currency: str,
                         address: str,
                         cartItem: Dict[str, Any],
-                        context: Optional[dict] = None) -> str:
+                        context: Optional[dict] = None) -> dict:
     """
     Create a order.
 
@@ -264,29 +246,15 @@ async def create_order( user: str,
     logger.info(f"func:{func_name} : order: {user} : {currency} : {address} : {cartItem} : context: {context}")
 
     url = ORDER_URL + "/order"
-
-    # extract the trace infos
-    carrier= context.get("_trace", {}) if context else {}
-    ctx = extract(carrier)
-    token = attach(ctx)
-
+    
     with tracer.start_as_current_span(func_name) as span:
         span.set_attribute("mcp.tool", func_name)
         span.set_attribute("request.url", url) 
 
-        jwt_token = context.get("jwt") if context else None
-        if not jwt_token:
-            span.set_status(trace.Status(trace.StatusCode.ERROR))
-            message_error = "No JWT provided, NOT AUTHORIZED, statuscode: 403"
-            logger.error("message_error")
-            return message_error
-    
-        if context:
-            token_pre_state = REQUEST_ID_CTX.set(context.get("x-request-id", "MCP_NOT_INFORMED"))
-
-        headers = {"Authorization": f"Bearer {jwt_token}",
-                   "X-Request-Id": REQUEST_ID_CTX.get(),
-        } 
+        # the REQUEST_ID_CTX and JWT_TOKEN is already set in the middleware
+        headers = {"Authorization": f"Bearer {JWT_TOKEN}",
+                   "X-Request-Id": REQUEST_ID_CTX.get()
+        }       
 
         transformed_cart_item = {
             "product": {
@@ -312,21 +280,26 @@ async def create_order( user: str,
         try:        
             async with aiohttp.ClientSession(timeout=session_timeout) as session:
                 async with session.post(url, headers=headers, json=payload) as resp:
-                    if resp.status == 200:
-                        
+                    if resp.status == 200:     
                         span.set_attribute("http.status_code", resp.status)
 
                         data = await resp.json()
                         logger.info(f"data: {data}")
-                        return f"{data}"
+                        return {"status": "success", 
+                                "status_code": resp.status,
+                                "message": "create_order", 
+                                "data": data}
                     else:
                         message_error = f"Failed to create ordder {user}, statuscode: {resp.status}"
                         logger.error(message_error)
-                        return message_error
+                        return {"status": "error", 
+                                "status_code": resp.status, 
+                                "message": message_error,
+                                "data": None}  
         except Exception as e:
             span.record_exception(e)
             logger.error(f"Exception : {e}")
-            return f"Exception : {e}"
-        finally:
-            REQUEST_ID_CTX.reset(token_pre_state)
-            detach(token)
+            return {"status": "error", 
+                    "status_code": 500, 
+                    "message": str(e),
+                    "data": None}
