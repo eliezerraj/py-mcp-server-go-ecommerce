@@ -23,20 +23,23 @@ async def health_check(request):
 # Ping
 # -----------------------------------------------------
 @mcp.tool(name="ping")
-async def ping() -> str:
+async def ping() -> dict:
     """
     Standard MCP handshake/health check method.
     """
     print('\033[31m =.=.= \033[0m' * 15)
     logger.info("func:ping")
 
-    return "pong"
+    return {"status": "success", 
+            "status_code": 200,
+            "message": "pong",
+            "data": None}
 
 # -----------------------------------------------------
 # Info
 # -----------------------------------------------------
 @mcp.tool(name="mcp_info")
-async def mcp_info() -> str:
+async def mcp_info() -> dict:
     """
     Information MCP server.
     """
@@ -55,13 +58,7 @@ async def mcp_info() -> str:
             "log_level": LOG_LEVEL,
     }
 
-    # Initialize with a default value
-    info = ""
-
-    try:
-        info_obj = Info(**info_data)
-        info = info_obj.model_dump_json()
-    except Exception as e:
-        logger.error(f"Exception : {e}")
-
-    return info
+    return {"status": "success", 
+            "status_code": 200,
+            "message": "mcp_info",
+            "data": info_data}
