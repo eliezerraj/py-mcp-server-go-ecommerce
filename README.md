@@ -24,8 +24,7 @@ To run in local machine for local tests creat a .env in /cmd folder
     INVENTORY_URL=http://localhost:7000
     ORDER_URL=http://localhost:7004
     LOG_LEVEL=INFO 
-    OTEL_LOGS=True
-    OTEL_STDOUT_LOG_GROUP=False
+    OTEL_STDOUT_LOG_GROUP=True
     LOG_GROUP=/mnt/c/Eliezer/log/py-mcp-server-go-ecommerce.log
 
 ## create venv
@@ -56,8 +55,7 @@ To run in local machine for local tests creat a .env in /cmd folder
     export INVENTORY_URL=http://localhost:7000
     export ORDER_URL=http://localhost:7004
     export LOG_LEVEL=INFO 
-    export OTEL_LOGS=true
-    export OTEL_STDOUT_LOG_GROUP=false
+    export OTEL_STDOUT_LOG_GROUP=True
     export LOG_GROUP=/mnt/c/Eliezer/log/py-mcp-server-go-ecommerce.log
 
 ## forward otel traces/metrics

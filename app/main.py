@@ -1,6 +1,6 @@
 import logging
 from app.model.entity import Info
-from app.server.mcp_server import VERSION, PORT, ACCOUNT ,HOST, SESSION_TIMEOUT, INVENTORY_URL,ORDER_URL ,LOG_LEVEL,APP_NAME,OTEL_EXPORTER_OTLP_ENDPOINT,LOG_GROUP, mcp
+from app.server.mcp_server import VERSION, PORT, ACCOUNT ,HOST, SESSION_TIMEOUT, INVENTORY_URL, ORDER_URL, LOG_LEVEL ,APP_NAME, OTEL_EXPORTER_OTLP_ENDPOINT, LOG_GROUP, OTEL_STDOUT_LOG_GROUP,mcp
 
 from app.log.logger import setup_logger
 from app.tracing.tracer import setup_tracer
@@ -10,7 +10,7 @@ from opentelemetry import trace
 #---------------------------------
 # Configure logging
 #---------------------------------
-setup_logger(LOG_LEVEL, APP_NAME, OTEL_EXPORTER_OTLP_ENDPOINT, LOG_GROUP)
+setup_logger(LOG_LEVEL, APP_NAME, OTEL_STDOUT_LOG_GROUP, LOG_GROUP)
 logger = logging.getLogger(__name__)
 
 #---------------------------------
