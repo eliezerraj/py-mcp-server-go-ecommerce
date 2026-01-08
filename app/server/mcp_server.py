@@ -29,7 +29,7 @@ print(f"LOG_LEVEL: {LOG_LEVEL}")
 print(f"OTEL_STDOUT_LOG_GROUP: {OTEL_STDOUT_LOG_GROUP}")
 print(f"LOG_GROUP: {LOG_GROUP}")
 print("CWD:", os.getcwd())
-
+print("---" * 15)
 #---------------------------------
 # setup MCP server
 #---------------------------------
