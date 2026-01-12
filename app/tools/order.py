@@ -22,7 +22,8 @@ session_timeout = aiohttp.ClientTimeout(total=SESSION_TIMEOUT)
 # Order Health
 # -----------------------------------------------------
 @mcp.tool(name="order_health")
-@context_middleware(require_context=True)
+@context_middleware(require_context=True,
+                    required_scope="tool:health")
 async def order_health(context: Optional[dict] = None) -> dict:
     """
     Check the health and enviroment variables of Order service.
@@ -84,7 +85,8 @@ async def order_health(context: Optional[dict] = None) -> dict:
 # Get Order
 # -----------------------------------------------------
 @mcp.tool(name="get_order")
-@context_middleware(require_context=True)
+@context_middleware(require_context=True,
+                    required_scope="tool:read")
 async def get_order(order: str, 
                     context: Optional[dict] = None) -> dict:
     """
@@ -147,7 +149,8 @@ async def get_order(order: str,
 # Checkout Order
 # -----------------------------------------------------
 @mcp.tool(name="checkout_order")
-@context_middleware(require_context=True)
+@context_middleware(require_context=True,
+                    required_scope="tool:read")
 async def checkout_order(order: int,
                          payment: Dict[str, Any],
                          context: Optional[dict] = None) -> dict:
@@ -219,7 +222,8 @@ async def checkout_order(order: int,
 # Create Order
 # -----------------------------------------------------
 @mcp.tool(name="create_order")
-@context_middleware(require_context=True)
+@context_middleware(require_context=True,
+                    required_scope="tool:read")
 async def create_order( user: str,
                         currency: str,
                         address: str,

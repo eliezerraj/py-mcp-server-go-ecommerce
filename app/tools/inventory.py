@@ -21,7 +21,8 @@ session_timeout = aiohttp.ClientTimeout(total=SESSION_TIMEOUT)
 # Inventory Heatlh
 # -----------------------------------------------------
 @mcp.tool(name="inventory_health")
-@context_middleware(require_context=True)
+@context_middleware(require_context=True,
+                    required_scope="tool:health")
 async def inventory_health(context: Optional[dict] = None) -> dict:
     """
     Check the health and enviroment variables of Inventory service.
@@ -81,7 +82,8 @@ async def inventory_health(context: Optional[dict] = None) -> dict:
 # Create inventory
 #----------------------------
 @mcp.tool(name="create_inventory")
-@context_middleware(require_context=True)
+@context_middleware(require_context=True,
+                    required_scope="tool:read")
 async def create_inventory( sku: str,
                             type: str,
                             name: str,
@@ -167,7 +169,8 @@ async def create_inventory( sku: str,
 # Get product
 #----------------------------
 @mcp.tool(name="get_product")
-@context_middleware(require_context=True)
+@context_middleware(require_context=True,
+                    required_scope="tool:read")
 async def get_product(sku: str, 
                       context: Optional[dict] = None) -> dict:
     """
@@ -227,7 +230,8 @@ async def get_product(sku: str,
 # Get inventory
 #----------------------------
 @mcp.tool(name="get_inventory")
-@context_middleware(require_context=True)
+@context_middleware(require_context=True,
+                    required_scope="tool:read")
 async def get_inventory(sku: str, 
                         context: Optional[dict] = None) -> dict:
     """
@@ -290,7 +294,8 @@ async def get_inventory(sku: str,
 # Update inventory
 #----------------------------
 @mcp.tool(name="update_inventory")
-@context_middleware(require_context=True)
+@context_middleware(require_context=True,
+                    required_scope="tool:read")
 async def update_inventory( sku: str,
                             available: int,
                             reserved: int,
