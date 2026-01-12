@@ -21,6 +21,10 @@ print("---" * 15)
 print(f"VERSION: {VERSION}")
 print(f"ACCOUNT: {ACCOUNT}")
 print(f"APP_NAME: {APP_NAME}")
+
+print(f"INVENTORY_URL: {INVENTORY_URL}")
+print(f"ORDER_URL: {ORDER_URL}")
+
 print(f"HOST: {HOST}")
 print(f"PORT: {PORT}")
 print(f"SESSION_TIMEOUT: {SESSION_TIMEOUT}")
@@ -30,6 +34,7 @@ print(f"OTEL_STDOUT_LOG_GROUP: {OTEL_STDOUT_LOG_GROUP}")
 print(f"LOG_GROUP: {LOG_GROUP}")
 print("CWD:", os.getcwd())
 print("---" * 15)
+
 #---------------------------------
 # setup MCP server
 #---------------------------------

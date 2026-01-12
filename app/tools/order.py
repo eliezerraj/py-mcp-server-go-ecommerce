@@ -7,7 +7,7 @@ from typing import Optional
 from app.log.logger import REQUEST_ID_CTX
 from app.server.mcp_server import SESSION_TIMEOUT, ORDER_URL, mcp
 
-from app.middleware.context_middleware import context_middleware, JWT_TOKEN
+from app.middleware.context_middleware import context_middleware
 
 from opentelemetry import trace, propagate
 from opentelemetry.propagate import extract
@@ -47,8 +47,8 @@ async def order_health(context: Optional[dict] = None) -> dict:
         span.set_attribute("mcp.tool", func_name)
         span.set_attribute("request.url", url) 
 
-        # the REQUEST_ID_CTX and JWT_TOKEN is already set in the middleware
-        headers = {"Authorization": f"Bearer {JWT_TOKEN}",
+        # the REQUEST_ID_CTX  is already set in the middleware
+        headers = {"Authorization": f"Bearer {context.get('Authorization')}",
                    "X-Request-Id": REQUEST_ID_CTX.get()
         }   
 
@@ -86,7 +86,7 @@ async def order_health(context: Optional[dict] = None) -> dict:
 # -----------------------------------------------------
 @mcp.tool(name="get_order")
 @context_middleware(require_context=True,
-                    required_scope="tool:read")
+                    required_scope="tool:get_order")
 async def get_order(order: str, 
                     context: Optional[dict] = None) -> dict:
     """
@@ -112,10 +112,10 @@ async def get_order(order: str,
         span.set_attribute("mcp.tool", func_name)
         span.set_attribute("request.url", url) 
 
-        # the REQUEST_ID_CTX and JWT_TOKEN is already set in the middleware
-        headers = {"Authorization": f"Bearer {JWT_TOKEN}",
+        # the REQUEST_ID_CTX  is already set in the middleware
+        headers = {"Authorization": f"Bearer {context.get('Authorization')}",
                    "X-Request-Id": REQUEST_ID_CTX.get()
-        }    
+        } 
 
         try:     
             async with aiohttp.ClientSession(timeout=session_timeout) as session:
@@ -150,7 +150,7 @@ async def get_order(order: str,
 # -----------------------------------------------------
 @mcp.tool(name="checkout_order")
 @context_middleware(require_context=True,
-                    required_scope="tool:read")
+                    required_scope="tool:checkout_order")
 async def checkout_order(order: int,
                          payment: Dict[str, Any],
                          context: Optional[dict] = None) -> dict:
@@ -178,10 +178,10 @@ async def checkout_order(order: int,
         span.set_attribute("mcp.tool", func_name)
         span.set_attribute("request.url", url) 
 
-        # the REQUEST_ID_CTX and JWT_TOKEN is already set in the middleware
-        headers = {"Authorization": f"Bearer {JWT_TOKEN}",
+        # the REQUEST_ID_CTX  is already set in the middleware
+        headers = {"Authorization": f"Bearer {context.get('Authorization')}",
                    "X-Request-Id": REQUEST_ID_CTX.get()
-        }   
+        } 
 
         payload = {
                     "id": order,
@@ -223,7 +223,7 @@ async def checkout_order(order: int,
 # -----------------------------------------------------
 @mcp.tool(name="create_order")
 @context_middleware(require_context=True,
-                    required_scope="tool:read")
+                    required_scope="tool:create_order")
 async def create_order( user: str,
                         currency: str,
                         address: str,
@@ -255,10 +255,10 @@ async def create_order( user: str,
         span.set_attribute("mcp.tool", func_name)
         span.set_attribute("request.url", url) 
 
-        # the REQUEST_ID_CTX and JWT_TOKEN is already set in the middleware
-        headers = {"Authorization": f"Bearer {JWT_TOKEN}",
+        # the REQUEST_ID_CTX  is already set in the middleware
+        headers = {"Authorization": f"Bearer {context.get('Authorization')}",
                    "X-Request-Id": REQUEST_ID_CTX.get()
-        }       
+        }     
 
         transformed_cart_item = {
             "product": {

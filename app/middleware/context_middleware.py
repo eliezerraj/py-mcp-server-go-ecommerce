@@ -100,11 +100,13 @@ def context_middleware(require_context: bool = True,
 
                 if not isinstance(scopes, list):
                     raise ContextError(403, "Scope malformed")
-
-                if required_scope and required_scope not in scopes:
-                    raise ContextError(403, "Insufficient scope")
+                
+                if required_scope:
+                    if "admin" not in scopes and required_scope not in scopes:
+                        raise ContextError(403, "Insufficient scope")
                                             
                 return await func(*args, **kwargs)
+            
             except ExpiredSignatureError:
                 return error_response(401, "Token has expired")
             except InvalidTokenError as e:
