@@ -53,7 +53,9 @@ To run in local machine for local tests creat a .env in /cmd folder
     export SESSION_TIMEOUT=700
     export OTEL_EXPORTER_OTLP_ENDPOINT=localhost:4317
     export INVENTORY_URL=http://localhost:7000
+    export INVENTORY_URL=https://go-api-global.architecture.caradhras.io/inventory
     export ORDER_URL=http://localhost:7004
+    export ORDER_URL=https://go-api-global.architecture.caradhras.io/order
     export LOG_LEVEL=INFO 
     export OTEL_STDOUT_LOG_GROUP=True
     export LOG_GROUP=/mnt/c/Eliezer/log/py-mcp-server-go-ecommerce.log
@@ -64,15 +66,22 @@ To run in local machine for local tests creat a .env in /cmd folder
 
 ## run mcp inspector
 
-    Session 1 (venv activated)
+    Session 1 (venv activated and NO EXPORT env)
     npx @modelcontextprotocol/inspector 
 
     Sesssion 2 (venv activated)
-    python ./app/server.py
+    python -m app.main
 
     Setup
     Transport Type: streamable http
     URL: http://localhost:9002/mcp
+
+## context
+
+        {
+        "Authorization": "eyJhbGci......72QMShTm9Vf7JnJx2w",
+        "x-request-id": "111122223333-4444-55555-66666"
+        }
 
 ## 1 Session Open
 

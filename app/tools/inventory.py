@@ -6,7 +6,7 @@ import aiohttp
 from typing import Optional
 from app.server.mcp_server import SESSION_TIMEOUT, INVENTORY_URL, mcp
 from app.log.logger import REQUEST_ID_CTX
-from app.middleware.context_middleware import context_middleware, JWT_TOKEN
+from app.middleware.context_middleware import context_middleware
 
 from opentelemetry import trace, propagate
 from opentelemetry.propagate import extract
@@ -21,7 +21,8 @@ session_timeout = aiohttp.ClientTimeout(total=SESSION_TIMEOUT)
 # Inventory Heatlh
 # -----------------------------------------------------
 @mcp.tool(name="inventory_health")
-@context_middleware(require_context=True)
+@context_middleware(require_context=True,
+                    required_scope="tool:health")
 async def inventory_health(context: Optional[dict] = None) -> dict:
     """
     Check the health and enviroment variables of Inventory service.
@@ -37,7 +38,7 @@ async def inventory_health(context: Optional[dict] = None) -> dict:
 
     func_name = inspect.currentframe().f_code.co_name
     
-    logger.info(f"func:{func_name}")
+    logger.info(f"func:{func_name} context:{context}")
 
     url = INVENTORY_URL + "/info"
 
@@ -45,8 +46,8 @@ async def inventory_health(context: Optional[dict] = None) -> dict:
         span.set_attribute("mcp.tool", func_name)
         span.set_attribute("request.url", url) 
 
-        # the REQUEST_ID_CTX and JWT_TOKEN is already set in the middleware
-        headers = {"Authorization": f"Bearer {JWT_TOKEN}",
+        # the REQUEST_ID_CTX  is already set in the middleware
+        headers = {"Authorization": f"Bearer {context.get('Authorization')}",
                    "X-Request-Id": REQUEST_ID_CTX.get()
         }   
 
@@ -81,7 +82,8 @@ async def inventory_health(context: Optional[dict] = None) -> dict:
 # Create inventory
 #----------------------------
 @mcp.tool(name="create_inventory")
-@context_middleware(require_context=True)
+@context_middleware(require_context=True,
+                    required_scope="tool:create_inventory")
 async def create_inventory( sku: str,
                             type: str,
                             name: str,
@@ -113,21 +115,11 @@ async def create_inventory( sku: str,
         span.set_attribute("mcp.tool", func_name)
         span.set_attribute("request.url", url) 
 
-        # extract jwt
-        jwt_token = context.get("jwt") if context else None
-        if not jwt_token:
-            span.set_status(trace.Status(trace.StatusCode.ERROR))
-            message_error = "No JWT provided, NOT AUTHORIZED, statuscode: 403"
-            logger.error(message_error)
-            return {"status": "error", 
-                    "status_code": 403,
-                    "message": message_error,
-                    "data": None}
-    
-        # the REQUEST_ID_CTX and JWT_TOKEN is already set in the middleware
-        headers = {"Authorization": f"Bearer {JWT_TOKEN}",
+        # the REQUEST_ID_CTX  is already set in the middleware
+        headers = {"Authorization": f"Bearer {context.get('Authorization')}",
                    "X-Request-Id": REQUEST_ID_CTX.get()
         }   
+ 
         #prepare payload
         payload = {
             "sku": sku,
@@ -167,7 +159,8 @@ async def create_inventory( sku: str,
 # Get product
 #----------------------------
 @mcp.tool(name="get_product")
-@context_middleware(require_context=True)
+@context_middleware(require_context=True,
+                    required_scope="tool:get_product")
 async def get_product(sku: str, 
                       context: Optional[dict] = None) -> dict:
     """
@@ -192,8 +185,8 @@ async def get_product(sku: str,
         span.set_attribute("mcp.tool", func_name)
         span.set_attribute("request.url", url) 
 
-        # the REQUEST_ID_CTX and JWT_TOKEN is already set in the middleware
-        headers = {"Authorization": f"Bearer {JWT_TOKEN}",
+        # the REQUEST_ID_CTX  is already set in the middleware
+        headers = {"Authorization": f"Bearer {context.get('Authorization')}",
                    "X-Request-Id": REQUEST_ID_CTX.get()
         }   
 
@@ -227,7 +220,8 @@ async def get_product(sku: str,
 # Get inventory
 #----------------------------
 @mcp.tool(name="get_inventory")
-@context_middleware(require_context=True)
+@context_middleware(require_context=True,
+                    required_scope="tool:get_inventory")
 async def get_inventory(sku: str, 
                         context: Optional[dict] = None) -> dict:
     """
@@ -254,11 +248,11 @@ async def get_inventory(sku: str,
         span.set_attribute("mcp.tool", func_name)
         span.set_attribute("request.url", url) 
 
-        # the REQUEST_ID_CTX and JWT_TOKEN is already set in the middleware
-        headers = {"Authorization": f"Bearer {JWT_TOKEN}",
+        # the REQUEST_ID_CTX  is already set in the middleware
+        headers = {"Authorization": f"Bearer {context.get('Authorization')}",
                    "X-Request-Id": REQUEST_ID_CTX.get()
         }   
-    
+
         try:     
             async with aiohttp.ClientSession(timeout=session_timeout) as session:
                 async with session.get(url, headers=headers) as resp:
@@ -290,7 +284,8 @@ async def get_inventory(sku: str,
 # Update inventory
 #----------------------------
 @mcp.tool(name="update_inventory")
-@context_middleware(require_context=True)
+@context_middleware(require_context=True,
+                    required_scope="tool:update_inventory")
 async def update_inventory( sku: str,
                             available: int,
                             reserved: int,
@@ -322,11 +317,11 @@ async def update_inventory( sku: str,
         span.set_attribute("mcp.tool", func_name)
         span.set_attribute("request.url", url) 
 
-        # the REQUEST_ID_CTX and JWT_TOKEN is already set in the middleware
-        headers = {"Authorization": f"Bearer {JWT_TOKEN}",
+        # the REQUEST_ID_CTX  is already set in the middleware
+        headers = {"Authorization": f"Bearer {context.get('Authorization')}",
                    "X-Request-Id": REQUEST_ID_CTX.get()
         }   
-        
+
         payload = {
             "available": available,
             "reserved": reserved,
