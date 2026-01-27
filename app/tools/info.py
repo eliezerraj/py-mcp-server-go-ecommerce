@@ -17,7 +17,7 @@ async def health_check(request):
     A simple health check that returns a healthy status.
     For a liveness probe, it should only confirm the process is running.
     """
-    logger.info("func:health_check")
+    logger.debug("func:health_check")
 
     return JSONResponse({"message": "true"})
 
