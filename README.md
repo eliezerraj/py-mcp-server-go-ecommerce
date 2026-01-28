@@ -23,7 +23,7 @@ To run in local machine for local tests creat a .env in /cmd folder
     OTEL_EXPORTER_OTLP_ENDPOINT=localhost:4317
     INVENTORY_URL=http://localhost:7000
     ORDER_URL=http://localhost:7004
-    LOG_LEVEL=INFO 
+    LOG_LEVEL= WARNING 
     OTEL_STDOUT_LOG_GROUP=True
     LOG_GROUP=/mnt/c/Eliezer/log/py-mcp-server-go-ecommerce.log
 
@@ -56,7 +56,7 @@ To run in local machine for local tests creat a .env in /cmd folder
     export INVENTORY_URL=https://go-api-global.architecture.caradhras.io/inventory
     export ORDER_URL=http://localhost:7004
     export ORDER_URL=https://go-api-global.architecture.caradhras.io/order
-    export LOG_LEVEL=INFO 
+    export LOG_LEVEL=WARNING 
     export OTEL_STDOUT_LOG_GROUP=True
     export LOG_GROUP=/mnt/c/Eliezer/log/py-mcp-server-go-ecommerce.log
 
